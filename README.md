@@ -1,8 +1,8 @@
-
-
 # MaazDB-Py 🐍
 
 **The Official Python Driver for MaazDB**
+
+[🌐 Official Website](https://maazdb.vercel.app/)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Python](https://img.shields.io/badge/python-3.7%2B-blue)
@@ -10,6 +10,10 @@
 
 `maazdb-py` is a pure-Python client library for interacting with the MaazDB engine. It implements the custom MaazDB binary protocol over a secure TLS 1.3 socket, allowing Python applications to communicate with your database safely and efficiently.
 
+## ⚙️ Compatibility
+
+This library is designed to work with:
+*   **MaazDB Server:** Version `v12.0.0` and above.
 
 ## 📦 Installation
 
@@ -85,7 +89,7 @@ All integers are packed as **Big Endian** (`>I` in Python `struct`).
 
 To run the included example script:
 
-1.  Ensure your **MaazDB Server** is running on port 8888.
+1.  Ensure your **MaazDB Server** (v12.0.0+) is running on port 8888.
 2.  Run the example:
 
 ```bash
