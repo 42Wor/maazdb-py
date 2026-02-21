@@ -49,7 +49,7 @@ db = MaazDB()
 
 try:
     # 2. Connect securely
-    db.connect(host="127.0.0.1", port=8888, user="admin", password="password")
+    db.connect(host="127.0.0.1", port=8888, user="admin", password="admin")
     print("✓ Connected to MaazDB")
 
     # 3. Execute SQL
