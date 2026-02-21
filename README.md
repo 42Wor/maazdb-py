@@ -77,7 +77,7 @@ The driver supports the `with` statement, which automatically closes the connect
 from maazdb import MaazDB
 
 with MaazDB() as db:
-    db.connect("127.0.0.1", 8888, "admin", "password")
+    db.connect("127.0.0.1", 8888, "admin", "admin")
     result = db.query("SELECT count(*) FROM users;")
     print(f"Total users: {result}")
 ```
