@@ -1,3 +1,4 @@
+# exceptions.py
 class MaazDBError(Exception):
     """Base class for all MaazDB exceptions."""
     pass

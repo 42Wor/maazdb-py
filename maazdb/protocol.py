@@ -1,3 +1,4 @@
+# protocol.py
 import struct
 
 # Constants matching Rust Server
@@ -9,7 +10,7 @@ PACKET_MSG       = 0x02
 PACKET_DATA      = 0x03
 
 # Driver Signature (Must match ALLOWED_DRIVERS in Rust Server)
-DRIVER_SIG = "maazdb-python-sdk-v2"
+DRIVER_SIG = "maazdb-python-sdk-v1"
 
 def pack_packet(ptype, payload):
     """
