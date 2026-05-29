@@ -1,6 +1,13 @@
+# FILE PATH: maazdb-py/examples/bench-1.py
+
 import sys
+import os
 import time
-import maazdb  # Assuming the python binding is named 'maazdb'
+
+# Add parent dir to path so we can import 'maazdb' without installing it via pip yet
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import maazdb  
 
 # Force UTF-8 (extra safety)
 try:

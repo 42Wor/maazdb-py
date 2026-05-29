@@ -1,0 +1,12 @@
+README.md
+setup.py
+maazdb/__init__.py
+maazdb/client.py
+maazdb/exceptions.py
+maazdb/protocol.py
+maazdb_py.egg-info/PKG-INFO
+maazdb_py.egg-info/SOURCES.txt
+maazdb_py.egg-info/dependency_links.txt
+maazdb_py.egg-info/not-zip-safe
+maazdb_py.egg-info/requires.txt
+maazdb_py.egg-info/top_level.txt

@@ -1,10 +1,7 @@
 # FILE PATH: examples/basic.py
 import sys
 import os
-
-# Add parent dir to path so we can import 'maazdb' without installing it via pip yet
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 from maazdb import MaazDB, MaazDBError
 
 def main():

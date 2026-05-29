@@ -1,4 +1,3 @@
-
 # MaazDB-Py 🐍
 
 **The Official Python Driver for MaazDB**
@@ -8,17 +7,18 @@
 ![Security](https://img.shields.io/badge/security-TLS_1.3-green)
 [![Website](https://img.shields.io/badge/Website-maazdb.vercel.app-blueviolet)](https://maazdb.vercel.app/)
 
-`maazdb-py` is a pure-Python client library for interacting with the MaazDB engine. It implements the custom MaazDB binary protocol over a secure TLS 1.3 socket, allowing Python applications to communicate with your database safely and efficiently.
+`maazdb-py` is a pure-Python client library for interacting with the MaazDB engine. It implements the custom MaazDB Binary Protocol v2.1 over a secure TLS 1.3 socket, allowing Python applications to communicate with your database safely, securely, and efficiently.
 
 ---
 
 ## ✨ Features
 
-- **Secure by Default:** Automatic TLS 1.3 encryption for all communications.
-- **Pure Python:** No heavy C-extensions; easy to install and cross-platform.
-- **Context Manager Support:** Use `with` statements for safe connection handling.
-- **Binary Protocol:** Optimized communication using the MaazDB Binary Protocol v1.
-- **Lightweight:** Minimal dependencies.
+- **Secure by Default:** TLS 1.3 socket wrapping for encrypted communication.
+- **Cryptographic Handshake:** Implements the Protocol v2.1 challenge-response flow utilizing HMAC-SHA256 signatures to verify credentials without plaintext protocol exposure.
+- **Latency-Optimized:** Disables Nagle's algorithm natively (`TCP_NODELAY`) to prevent OS-level packet buffering, reducing round-trip latency.
+- **0-RTT Early Data Auto-Opt-In:** Automatically evaluates statements and tags read-only queries (`SELECT`, `SHOW`, `DESCRIBE`) with the `FLAG_EARLY_DATA` bitmask to execute safely during early TLS connection flights.
+- **Context Manager Support:** Use `with` statements for safe, automated connection lifecycle management.
+- **Pure Python:** No heavy C-extensions; lightweight with minimal dependencies.
 
 ---
 
@@ -48,7 +48,7 @@ from maazdb import MaazDB
 db = MaazDB()
 
 try:
-    # 2. Connect securely
+    # 2. Connect securely (Handshake, HMAC signatures, and TCP_NODELAY are handled automatically)
     db.connect(host="127.0.0.1", port=8888, user="admin", password="admin")
     print("✓ Connected to MaazDB")
 
@@ -71,7 +71,7 @@ finally:
 ```
 
 ### Using Context Managers (Recommended)
-The driver supports the `with` statement, which automatically closes the connection even if an error occurs.
+The driver supports the `with` statement, which automatically closes the socket connection even if an error occurs.
 
 ```python
 from maazdb import MaazDB
@@ -89,7 +89,7 @@ with MaazDB() as db:
 ### `MaazDB()`
 The main class to interact with the database.
 
-- **`.connect(host, port, user, password)`**: Establishes a TLS 1.3 connection and performs the handshake.
+- **`.connect(host, port, user, password)`**: Establishes a TLS 1.3 connection, configures TCP socket settings, and performs the challenge-response handshake.
 - **`.query(sql_string)`**: Sends a SQL query to the server and returns the result as a string.
 - **`.close()`**: Safely closes the socket connection.
 
@@ -97,14 +97,22 @@ The main class to interact with the database.
 
 ## 🔐 Security & Protocol
 
-The driver communicates using the **MaazDB Binary Protocol v1**. All data is packed as **Big Endian** (`>I`).
+The driver communicates using the **MaazDB Binary Protocol v2.1**. All integers are packed using Big Endian format (`>BBHI`). 
 
-| Step | Type | Description |
-| :--- | :--- | :--- |
-| **Handshake** | `0x10` | `[Type] [Len] [User\0Pass\0Signature]` |
-| **Query** | `0x20` | `[Type] [Len] [SQL String]` |
-| **Success** | `0x02` | `[Type] [Len] [Result Data]` |
-| **Error** | `0x03` | `[Type] [Len] [Error Message]` |
+The 8-byte header structure is arranged as:
+`[Type: 1B] [Flags: 1B] [Req ID: 2B] [Payload Length: 4B] [PayloadBytes]`
+
+### Packet Type Mapping
+
+| Step | Type (Hex) | Name | Description |
+| :--- | :--- | :--- | :--- |
+| **1. Challenge Request** | `0x10` | `CHALLENGE_REQ` | Sent by server containing 32-byte ephemeral random nonce. |
+| **2. Challenge Response** | `0x11` | `CHALLENGE_RESP` | Sent by client with format: `Username\0Password\0DriverID\0SignatureHex`. |
+| **3. Verification Success** | `0x12` | `AUTH_OK` | Sent by server confirming handshake and credentials. |
+| **4. Verification Failure** | `0x13` | `AUTH_ERR` | Sent by server rejecting credentials or dropping session. |
+| **5. Query Dispatch** | `0x20` | `QUERY` | Sent by client containing SQL query payload. |
+| **6. Message Response** | `0x02` | `MSG_RESPONSE` | Sent by server containing execution status or response string. |
+| **7. Data Response** | `0x03` | `DATA_RESPONSE` | Sent by server containing structured JSON columnar results. |
 
 ---
 
@@ -123,3 +131,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 *Created for the [MaazDB Ecosystem](https://maazdb.vercel.app/).*
+```
